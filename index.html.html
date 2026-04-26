@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaxSaaS Ghana - Smart Tax Compliance Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #f5576c;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card .amount {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .card .subtitle {
+            color: #999;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        /* Forms */
+        .form-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #f5576c;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        /* Auth Modal */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .auth-toggle button {
+            flex: 1;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .auth-toggle button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .nav-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-container">
+            <div class="auth-header">
+                <h2>🇬🇭 TaxSaaS Ghana</h2>
+                <p>Smart Tax Compliance Platform</p>
+            </div>
+            <div class="auth-toggle">
+                <button id="loginTabBtn" class="active" onclick="showAuthForm('login')">Login</button>
+                <button id="registerTabBtn" onclick="showAuthForm('register')">Register</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>TIN / GhanaCard PIN</label>
+                    <input type="text" id="loginTIN" required placeholder="e.g., P-123456789-0">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" style="width: 100%">Login</button>
+            </form>
+            
+            <!-- Register Form -->
+            <form id="registerForm" style="display:none" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" required>
+                </div>
+                <div class="form-group">
+                    <label>TIN / GhanaCard PIN</label>
+                    <input type="text" id="regTIN" required placeholder="e.g., P-123456789-0">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="regEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>User Type</label>
+                    <select id="regType">
+                        <option value="individual">Individual</option>
+                        <option value="business">Business</option>
+                        <option value="professional">Tax Professional</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <button type="submit" style="width: 100%">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App (Hidden until login) -->
+    <div id="mainApp" style="display:none">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">🇬🇭 TaxSaaS Ghana</div>
+                <div class="nav-links">
+                    <a class="nav-link active" onclick="switchSection('dashboard')">Dashboard</a>
+                    <a class="nav-link" onclick="switchSection('tax-calculation')">Tax Calculator</a>
+                    <a class="nav-link" onclick="switchSection('filing')">File Returns</a>
+                    <a class="nav-link" onclick="switchSection('payments')">Payments</a>
+                    <a class="nav-link" onclick="switchSection('reports')">Reports</a>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection">
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <h3>Total Tax Liability</h3>
+                        <div class="amount" id="totalLiability">₵0</div>
+                        <div class="subtitle">Current tax period</div>
+                    </div>
+                    <div class="card">
+                        <h3>Tax Paid</h3>
+                        <div class="amount" id="taxPaid">₵0</div>
+                        <div class="subtitle">Year to date</div>
+                    </div>
+                    <div class="card">
+                        <h3>Outstanding Balance</h3>
+                        <div class="amount" id="outstandingBalance">₵0</div>
+                        <div class="subtitle">Due before deadline</div>
+                    </div>
+                    <div class="card">
+                        <h3>Next Deadline</h3>
+                        <div class="amount" id="nextDeadline">Apr 30</div>
+                        <div class="subtitle">Personal Income Tax</div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Recent Transactions</h3>
+                    <div class="table-container">
+                        <table id="transactionsTable">
+                            <thead>
+                                <tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th><th>Reference</th></tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tax Calculator Section -->
+            <div id="taxCalculationSection" style="display:none">
+                <div class="form-section">
+                    <h2>🇬🇭 Ghana Tax Calculator</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Income / Revenue (₵)</label>
+                            <input type="number" id="calcIncome" placeholder="Enter amount">
+                        </div>
+                        <div class="form-group">
+                            <label>Tax Year</label>
+                            <select id="calcYear">
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Taxpayer Type</label>
+                            <select id="calcType">
+                                <option value="individual">Individual (Personal Income Tax)</option>
+                                <option value="business">Business (Corporate Income Tax)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="calculateTax()">Calculate Tax</button>
+                    
+                    <div id="taxResults" style="margin-top: 2rem; display:none">
+                        <h3>Tax Breakdown</h3>
+                        <div class="dashboard-grid">
+                            <div class="card"><h3>Income Tax</h3><div class="amount" id="incomeTax">₵0</div></div>
+                            <div class="card"><h3>NHIL (2.5%)</h3><div class="amount" id="nhilTax">₵0</div></div>
+                            <div class="card"><h3>GETFL (2.5%)</h3><div class="amount" id="getflTax">₵0</div></div>
+                            <div class="card"><h3>Total Tax Due</h3><div class="amount" id="totalTax">₵0</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filing Section -->
+            <div id="filingSection" style="display:none">
+                <div class="form-section">
+                    <h2>File Tax Return</h2>
+                    <form id="filingForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Tax Type</label>
+                                <select id="filingType" required>
+                                    <option value="PIT">Personal Income Tax (PIT)</option>
+                                    <option value="CIT">Corporate Income Tax (CIT)</option>
+                                    <option value="VAT">Value Added Tax (VAT)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Period</label>
+                                <select id="filingPeriod">
+                                    <option value="Q1">Q1 (Jan-Mar)</option>
+                                    <option value="Q2">Q2 (Apr-Jun)</option>
+                                    <option value="Q3">Q3 (Jul-Sep)</option>
+                                    <option value="Q4">Q4 (Oct-Dec)</option>
+                                    <option value="Annual">Annual Return</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Taxable Amount (₵)</label>
+                                <input type="number" id="filingAmount" required>
+                            </div>
+                        </div>
+                        <button type="submit">File Return with GRA Portal</button>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <h3>Filing History</h3>
+                    <table id="filingsTable">
+                        <thead><tr><th>Date</th><th>Type</th><th>Period</th><th>Amount</th><th>Status</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Payments Section -->
+            <div id="paymentsSection" style="display:none">
+                <div class="form-section">
+                    <h2>Make Tax Payment</h2>
+                    <p>Integrated with Ghana.gov Payment Gateway</p>
+                    <form id="paymentForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Amount (₵)</label>
+                                <input type="number" id="paymentAmount" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Payment Method</label>
+                                <select id="paymentMethod">
+                                    <option value="mobile_money">Mobile Money (MoMo)</option>
+                                    <option value="card">Bank Card</option>
+                                    <option value="bank_transfer">Bank Transfer</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Reference (Optional)</label>
+                                <input type="text" id="paymentRef" placeholder="TIN or Return ID">
+                            </div>
+                        </div>
+                        <button type="submit">Proceed to Payment via Ghana.gov</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reportsSection" style="display:none">
+                <div class="form-section">
+                    <h2>Tax Reports & Analytics</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Report Type</label>
+                            <select id="reportType">
+                                <option value="summary">Tax Summary</option>
+                                <option value="audit">Audit Trail</option>
+                                <option value="compliance">Compliance Report</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Year</label>
+                            <select id="reportYear">
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="generateReport()">Generate Report</button>
+                    <div id="reportOutput" style="margin-top: 2rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ghana Tax Rates (based on GRA 2024)
+        const TAX_RATES = {
+            personal: [
+                { upTo: 4900, rate: 0 },
+                { upTo: 11700, rate: 0.05 },
+                { upTo: 16500, rate: 0.10 },
+                { upTo: 36000, rate: 0.175 },
+                { upTo: 60000, rate: 0.25 },
+                { upTo: Infinity, rate: 0.30 }
+            ],
+            corporate: 0.25, // 25% for 2024
+            vat: 0.15,
+            nhil: 0.025,
+            getfl: 0.025
+        };
+
+        // Data storage
+        let currentUser = null;
+        let filings = JSON.parse(localStorage.getItem('tax_filings')) || [];
+        let payments = JSON.parse(localStorage.getItem('tax_payments')) || [];
+        let users = JSON.parse(localStorage.getItem('tax_users')) || [];
+
+        // Initialize sample users if empty
+        if (users.length === 0) {
+            users.push({
+                id: 1,
+                name: "Demo User",
+                tin: "P-123456789-0",
+                email: "demo@taxsaas.com",
+                type: "individual",
+                password: "password123"
+            });
+            localStorage.setItem('tax_users', JSON.stringify(users));
+        }
+
+        // Show auth modal on load
+        document.getElementById('authModal').style.display = 'flex';
+
+        function showAuthForm(formType) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginTab = document.getElementById('loginTabBtn');
+            const registerTab = document.getElementById('registerTabBtn');
+            
+            if (formType === 'login') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+                loginTab.classList.add('active');
+                registerTab.classList.remove('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+                loginTab.classList.remove('active');
+                registerTab.classList.add('active');
+            }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const tin = document.getElementById('loginTIN').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const user = users.find(u => u.tin === tin && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                document.getElementById('authModal').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                updateDashboard();
+                loadUserData();
+            } else {
+                alert('Invalid TIN or Password. Use Demo: P-123456789-0 / password123');
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const newUser = {
+                id: Date.now(),
+                name: document.getElementById('regName').value,
+                tin: document.getElementById('regTIN').value,
+                email: document.getElementById('regEmail').value,
+                type: document.getElementById('regType').value,
+                password: document.getElementById('regPassword').value
+            };
+            
+            if (users.find(u => u.tin === newUser.tin)) {
+                alert('TIN already registered!');
+                return;
+            }
+            
+            users.push(newUser);
+            localStorage.setItem('tax_users', JSON.stringify(users));
+            alert('Registration successful! Please login.');
+            showAuthForm('login');
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('authModal').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+        }
+
+        function switchSection(section) {
+            document.querySelectorAll('.container > div').forEach(div => div.style.display = 'none');
+            document.getElementById(`${section}Section`).style.display = 'block';
+            
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function calculateTax() {
+            const income = parseFloat(document.getElementById('calcIncome').value);
+            const type = document.getElementById('calcType').value;
+            
+            if (isNaN(income)) {
+                alert('Please enter a valid income amount');
+                return;
+            }
+            
+            let incomeTax = 0;
+            
+            if (type === 'individual') {
+                let remainingIncome = income;
+                let prevLimit = 0;
+                
+                for (let bracket of TAX_RATES.personal) {
+                    const taxableInBracket = Math.min(remainingIncome, bracket.upTo - prevLimit);
+                    if (taxableInBracket > 0) {
+                        incomeTax += taxableInBracket * bracket.rate;
+                        remainingIncome -= taxableInBracket;
+                    }
+                    if (remainingIncome <= 0) break;
+                    prevLimit = bracket.upTo;
+                }
+            } else {
+                incomeTax = income * TAX_RATES.corporate;
+            }
+            
+            const nhilTax = income * TAX_RATES.nhil;
+            const getflTax = income * TAX_RATES.getfl;
+            const totalTax = incomeTax + nhilTax + getflTax;
+            
+            document.getElementById('incomeTax').innerHTML = `₵${incomeTax.toFixed(2)}`;
+            document.getElementById('nhilTax').innerHTML = `₵${nhilTax.toFixed(2)}`;
+            document.getElementById('getflTax').innerHTML = `₵${getflTax.toFixed(2)}`;
+            document.getElementById('totalTax').innerHTML = `₵${totalTax.toFixed(2)}`;
+            document.getElementById('taxResults').style.display = 'block';
+        }
+
+        document.getElementById('filingForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const filing = {
+                id: Date.now(),
+                userId: currentUser.id,
+                date: new Date().toISOString().split('T')[0],
+                type: document.getElementById('filingType').value,
+                period: document.getElementById('filingPeriod').value,
+                amount: parseFloat(document.getElementById('filingAmount').value),
+                status: 'Filed with GRA',
+                reference: `GRA-${Date.now()}`
+            };
+            
+            filings.push(filing);
+            localStorage.setItem('tax_filings', JSON.stringify(filings));
+            alert(`Return filed successfully!\nReference: ${filing.reference}\nStatus: Pending GRA processing`);
+            loadFilings();
+            e.target.reset();
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const payment = {
+                id: Date.now(),
+                userId: currentUser.id,
+                date: new Date().toISOString().split('T')[0],
+                amount: parseFloat(document.getElementById('paymentAmount').value),
+                method: document.getElementById('paymentMethod').value,
+                reference: document.getElementById('paymentRef').value || `PAY-${Date.now()}`,
+                status: 'Completed'
+            };
+            
+            payments.push(payment);
+            localStorage.setItem('tax_payments', JSON.stringify(payments));
+            alert(`Payment of ₵${payment.amount.toFixed(2)} processed via Ghana.gov\nTransaction ID: ${payment.reference}`);
+            updateDashboard();
+            e.target.reset();
+        });
+
+        function generateReport() {
+            const type = document.getElementById('reportType').value;
+            const year = document.getElementById('reportYear').value;
+            
+            const userFilings = filings.filter(f => f.userId === currentUser.id && f.date.includes(year));
+            const userPayments = payments.filter(p => p.userId === currentUser.id && p.date.includes(year));
+            
+            const totalLiability = userFilings.reduce((sum, f) => sum + f.amount, 0);
+            const totalPaid = userPayments.reduce((sum, p) => sum + p.amount, 0);
+            const balance = totalLiability - totalPaid;
+            
+            let reportHTML = `
+                <div class="form-section">
+                    <h3>Tax Report for ${year}</h3>
+                    <div class="dashboard-grid">
+                        <div class="card"><h3>Total Liability</h3><div class="amount">₵${totalLiability.toFixed(2)}</div></div>
+                        <div class="card"><h3>Total Paid</h3><div class="amount">₵${totalPaid.toFixed(2)}</div></div>
+                        <div class="card"><h3>Balance Due</h3><div class="amount">₵${balance.toFixed(2)}</div></div>
+                    </div>
+            `;
+            
+            if (type === 'audit') {
+                reportHTML += `
+                    <h4>Audit Trail</h4>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Date</th><th>Action</th><th>Amount</th><th>Reference</th></tr></thead>
+                            <tbody>
+                                ${userFilings.map(f => `<tr><td>${f.date}</td><td>Filed ${f.type}</td><td>₵${f.amount.toFixed(2)}</td><td>${f.reference}</td></tr>`).join('')}
+                                ${userPayments.map(p => `<tr><td>${p.date}</td><td>Payment</td><td>₵${p.amount.toFixed(2)}</td><td>${p.reference}</td></tr>`).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            reportHTML += `</div>`;
+            document.getElementById('reportOutput').innerHTML = reportHTML;
+        }
+
+        function updateDashboard() {
+            const userPayments = payments.filter(p => p.userId === currentUser.id);
+            const userFilings = filings.filter(f => f.userId === currentUser.id);
+            
+            const totalPaid = userPayments.reduce((sum, p) => sum + p.amount, 0);
+            const totalLiability = userFilings.reduce((sum, f) => sum + f.amount, 0);
+            const outstanding = totalLiability - totalPaid;
+            
+            document.getElementById('totalLiability').innerHTML = `₵${totalLiability.toFixed(2)}`;
+            document.getElementById('taxPaid').innerHTML = `₵${totalPaid.toFixed(2)}`;
+            document.getElementById('outstandingBalance').innerHTML = `₵${outstanding.toFixed(2)}`;
+            
+            // Show recent transactions
+            const tbody = document.querySelector('#transactionsTable tbody');
+            tbody.innerHTML = '';
+            [...userFilings, ...userPayments].sort((a,b) => b.id - a.id).slice(0,10).forEach(t => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${t.date}</td>
+                    <td>${t.type || 'Payment'}</td>
+                    <td>₵${(t.amount || 0).toFixed(2)}</td>
+                    <td><span class="status-badge status-paid">${t.status || 'Completed'}</span></td>
+                    <td>${t.reference || 'N/A'}</td>
+                `;
+            });
+        }
+
+        function loadFilings() {
+            const tbody = document.querySelector('#filingsTable tbody');
+            tbody.innerHTML = '';
+            const userFilings = filings.filter(f => f.userId === currentUser.id);
+            userFilings.forEach(f => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${f.date}</td>
+                    <td>${f.type}</td>
+                    <td>${f.period}</td>
+                    <td>₵${f.amount.toFixed(2)}</td>
+                    <td><span class="status-badge status-paid">${f.status}</span></td>
+                `;
+            });
+        }
+
+        function loadUserData() {
+            updateDashboard();
+            loadFilings();
+        }
+
+        // Check for saved session
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            document.getElementById('authModal').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadUserData();
+        }
+    </script>
+</body>
+</html>
